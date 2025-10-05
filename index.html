@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rialo — Community Quiz & Leaderboard</title>
+  <meta name="description" content="Rialo community quiz — learn about Rialo, test yourself, share scores with @RialoHQ & @itachee_x" />
+  <style>
+    :root{
+      --bg1:#031427;
+      --bg2:#072a3a;
+      --accent:#00d4ff;
+      --accent-2:#7c3aed;
+      --card:#071826;
+      --muted:#9fb8c9;
+      --glass: rgba(255,255,255,0.04);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#e6f7ff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      justify-content:center;
+      padding:40px 18px;
+    }
+    .wrap{width:100%;max-width:1100px}
+    header{
+      text-align:center;
+      margin-bottom:28px;
+    }
+    .brand{
+      display:inline-block;
+      padding:12px 16px;
+      border-radius:999px;
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      font-weight:700;
+      color:#031427;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.45);
+    }
+    h1{font-size:32px;margin:12px 0 6px}
+    p.lead{color:var(--muted);max-width:900px;margin:0 auto 18px}
+
+    /* layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:22px;
+      align-items:start;
+    }
+    @media (max-width:980px){ .grid{grid-template-columns:1fr} }
+
+    /* left column — hero + infographic + quiz */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      padding:20px;
+      border-radius:var(--radius);
+      box-shadow:0 8px 30px rgba(0,0,0,0.45);
+    }
+
+    .infographic{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      margin-bottom:16px;
+    }
+    @media(max-width:640px){ .infographic{grid-template-columns:1fr} }
+    .infocard{
+      background:var(--glass);
+      padding:14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .infocard h3{margin:0 0 6px;color:var(--accent)}
+    .infocard p{margin:0;color:var(--muted);font-size:13px}
+
+    /* quiz */
+    .quiz-area{margin-top:18px}
+    .meta{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .progress{
+      height:10px;
+      background:rgba(255,255,255,0.04);
+      border-radius:999px;
+      overflow:hidden;
+      flex:1;margin-left:12px
+    }
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%}
+
+    .question{
+      font-size:18px;
+      font-weight:600;
+      margin:14px 0;
+      color:#eafcff;
+    }
+    .options{display:flex;flex-direction:column;gap:8px}
+    .opt-btn{
+      background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      padding:12px 14px;
+      border-radius:10px;
+      cursor:pointer;
+      text-align:left;
+      transition:all .18s ease;
+      color:#e6fbff;
+      font-weight:500;
+    }
+    .opt-btn:hover{transform:translateY(-4px);box-shadow:0 8px 40px rgba(0,212,255,0.06)}
+    .opt-btn.correct{background:linear-gradient(90deg,#0fd18a,#00b894);color:#021014;border-color:transparent}
+    .opt-btn.wrong{background:linear-gradient(90deg,#ff6b6b,#ff8787);color:#210101;border-color:transparent}
+
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+    .btn{
+      padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:700;color:#021014;
+      background:var(--accent);box-shadow:0 8px 30px rgba(0,0,0,0.35)
+    }
+    .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.06)}
+    .hint{color:var(--muted);font-size:13px;margin-top:10px}
+
+    /* right column — sidebar: leaderboard & daily question & share */
+    .sidebar .box{margin-bottom:16px;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
+    .lead-title{color:var(--accent);font-weight:700;margin-bottom:10px}
+    .leaderboard ol{padding-left:18px;color:var(--muted)}
+    .leaderboard li{margin:8px 0}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* final score area */
+    .result{
+      margin-top:14px;
+      padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(0,212,255,0.06), rgba(124,58,237,0.06));
+      border:1px solid rgba(255,255,255,0.03)
+    }
+    .celebrate{
+      color:#00ff9d;font-weight:800;font-size:18px;margin-top:8px;text-shadow:0 4px 18px rgba(0,255,157,0.10)
+    }
+
+    /* tiny footer */
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+    a.link{color:var(--accent);font-weight:700;text-decoration:none}
+    input.name{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);width:100%;background:transparent;color:#e6fbff;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">RIALO</div>
+      <h1>Rialo — Real-World Web3 Quiz</h1>
+      <p class="lead">Learn about Rialo, test your knowledge, and get visible in the community. Share your score tagging <a class="link" href="https://x.com/RialoHQ" target="_blank">@RialoHQ</a> and <a class="link" href="https://x.com/itachee_x" target="_blank">@itachee_x</a>.</p>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: content -->
+      <div>
+        <div class="card">
+          <div class="infographic">
+            <div class="infocard">
+              <h3>🌐 Real-World Data</h3>
+              <p>Rialo focuses on bringing safe, verifiable real-world data into Web3 apps and blockchains.</p>
+            </div>
+            <div class="infocard">
+              <h3>⚡ Real-World Speed</h3>
+              <p>Designed for high throughput and low-latency operations — real trading & real data needs speed.</p>
+            </div>
+            <div class="infocard">
+              <h3>🔒 Privacy & Connectivity</h3>
+              <p>Privacy-first connectivity with infrastructure built for interoperable Web3 services.</p>
+            </div>
+            <div class="infocard">
+              <h3>💰 Backed by Top Funds</h3>
+              <p>Rialo raised major seed funding from Pantera, Coinbase Ventures and others.</p>
+            </div>
+          </div>
+
+          <div class="quiz-area">
+            <div class="meta">
+              <div class="small">Interactive quiz — 5 questions (quick), plus a Daily Bonus</div>
+              <div class="progress" title="Progress"><i id="progressBar"></i></div>
+            </div>
+
+            <div id="quizBox">
+              <div class="question" id="questionText">Loading…</div>
+              <div class="options" id="options"></div>
+
+              <div class="controls">
+                <button class="btn" id="nextBtn" style="display:none">Next →</button>
+                <button class="btn secondary" id="revealBtn">Reveal Answer</button>
+                <button class="btn secondary" id="resetBtn">Reset Quiz</button>
+                <button class="btn secondary" id="shareBtn">Share / Copy Link</button>
+              </div>
+
+              <div class="hint" id="hintText">Tip: share your score on X and tag the team to get noticed.</div>
+            </div>
+
+            <div id="finalArea" style="display:none" class="result">
+              <div><strong>Your Score:</strong> <span id="scoreVal">0</span> / <span id="totalQ">5</span></div>
+              <div id="specialMsg" class="celebrate" style="display:none">🎉 Perfect score! Tweet your win and tag the team — you'll get noticed.</div>
+
+              <div style="margin-top:10px">
+                <label for="playerName" class="small">Enter name for leaderboard (or wallet handle):</label>
+                <input id="playerName" class="name" placeholder="Your name or @handle (optional)" />
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <button class="btn" id="saveScoreBtn">Save to Leaderboard</button>
+                  <button class="btn" id="tweetScoreBtn">Tweet Score</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="height:18px"></div>
+
+        <!-- DAILY BONUS -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong style="color:var(--accent)">Daily Bonus</strong><div class="small">One rotating bonus question per day</div></div>
+            <div class="small">Today's date: <span id="todayDate"></span></div>
+          </div>
+          <hr style="border:0;height:1px;background:rgba(255,255,255,0.03);margin:12px 0">
+          <div id="dailyQuestion" class="small">Loading daily question…</div>
+          <div style="margin-top:10px"><button class="btn secondary" id="dailyReveal">Show Answer</button></div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: sidebar -->
+      <aside class="sidebar">
+        <div class="box card">
+          <div class="lead-title">Top Contributors (Leaderboard)</div>
+          <div class="leaderboard" id="leaderboardBox">
+            <ol id="leaderboardList"><li class="small">No scores yet — be the first!</li></ol>
+          </div>
+          <div class="small" style="margin-top:10px">Scores stored locally in your browser (you can clear them anytime).</div>
+        </div>
+
+        <div class="box card">
+          <div class="lead-title">Community CTA</div>
+          <p class="small">Share your score on X and tag the team:</p>
+          <p class="small"><a class="link" href="https://x.com/RialoHQ" target="_blank">@RialoHQ</a> • <a class="link" href="https://x.com/itachee_x" target="_blank">@itachee_x</a></p>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn" id="tweetCTA">Tweet: I scored on the Rialo quiz</button>
+            <button class="btn secondary" id="openSiteBtn">Open Official Site</button>
+          </div>
+        </div>
+
+        <div class="box card">
+          <div class="lead-title">Why this helps</div>
+          <p class="small">Community tools (quizzes, leaderboards, sharable content) show initiative and help you stand out to project teams — perfect for OG consideration.</p>
+        </div>
+      </aside>
+    </div>
+
+    <footer>Built for the Rialo community • Improve, share, repeat — tag <a class="link" href="https://x.com/RialoHQ" target="_blank">@RialoHQ</a> & <a class="link" href="https://x.com/itachee_x" target="_blank">@itachee_x</a></footer>
+  </div>
+
+  <script>
+    /***************
+     * Quiz + Leaderboard logic (single-file)
+     ***************/
+
+    // Quiz bank — 5 primary questions + 1 daily rotating bonus (can expand)
+    const quizBank = [
+      { q: "What is Rialo's primary mission?", opts: ["Gaming dApp", "Connect real-world data to Web3", "NFT marketplace", "Yield farming"], a: 1 },
+      { q: "Who is the CEO / Co-founder associated with Rialo?", opts: ["Ade Adepoju", "Vitalik Buterin", "Sam Altman", "Changpeng Zhao"], a: 0 },
+      { q: "Which firm led Rialo's seed funding?", opts: ["Pantera Capital", "Binance Labs", "a16z", "Sequoia"], a: 0 },
+      { q: "What is a key emphasis of Rialo?", opts: ["Real-world speed", "Only NFTs", "Centralized custody", "High fees"], a: 0 },
+      { q: "Where can you follow official updates?", opts: ["@RialoHQ on X", "@randomuser on Instagram", "Private forum only", "No social accounts"], a: 0 }
+    ];
+
+    const dailyPool = [
+      { q: "Daily: Rialo is built by which lab or team?", a: "Subzero Labs" },
+      { q: "Daily: Rialo raised a seed round of roughly how much (USD)?", a: "Around $20M" },
+      { q: "Daily: Rialo focuses on connecting what to blockchains?", a: "Real-world data" },
+      { q: "Daily: Which investor participated in Rialo's round?", a: "Coinbase Ventures" },
+      { q: "Daily: Main goal is to improve what in Web3 apps?", a: "Connectivity & speed" }
+    ];
+
+    // UI refs
+    const questionText = document.getElementById('questionText');
+    const optionsEl = document.getElementById('options');
+    const progressBar = document.getElementById('progressBar');
+    const nextBtn = document.getElementById('nextBtn');
+    const revealBtn = document.getElementById('revealBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const finalArea = document.getElementById('finalArea');
+    const quizBox = document.getElementById('quizBox');
+    const scoreVal = document.getElementById('scoreVal');
+    const totalQ = document.getElementById('totalQ');
+    const playerNameInput = document.getElementById('playerName');
+    const saveScoreBtn = document.getElementById('saveScoreBtn');
+    const tweetScoreBtn = document.getElementById('tweetScoreBtn');
+    const leaderboardList = document.getElementById('leaderboardList');
+    const tweetCTA = document.getElementById('tweetCTA');
+    const openSiteBtn = document.getElementById('openSiteBtn');
+    const dailyQuestionDiv = document.getElementById('dailyQuestion');
+    const dailyReveal = document.getElementById('dailyReveal');
+    const todayDate = document.getElementById('todayDate');
+    const specialMsg = document.getElementById('specialMsg');
+
+    // quiz state
+    let currentIndex = 0, score = 0, answered = false;
+    const QUESTIONS = quizBank.slice(0,5); // 5 quick questions
+    totalQ.textContent = QUESTIONS.length;
+
+    // Initialize
+    function loadQuestion(i = currentIndex){
+      const q = QUESTIONS[i];
+      questionText.textContent = `${i+1}. ${q.q}`;
+      optionsEl.innerHTML = '';
+      q.opts.forEach((opt, idx) => {
+        const b = document.createElement('button');
+        b.className = 'opt-btn';
+        b.textContent = opt;
+        b.onclick = () => selectOption(idx, b, q.a);
+        optionsEl.appendChild(b);
+      });
+      updateProgress();
+      nextBtn.style.display = 'none';
+      revealBtn.style.display = 'inline-block';
+    }
+
+    function selectOption(selectedIdx, btnEl, correctIdx){
+      if(answered) return;
+      answered = true;
+      // mark options visually
+      const btns = optionsEl.querySelectorAll('.opt-btn');
+      btns.forEach((b, i) => {
+        if(i === correctIdx) b.classList.add('correct');
+        if(i === selectedIdx && i !== correctIdx) b.classList.add('wrong');
+        b.disabled = true;
+      });
+      if(selectedIdx === correctIdx) score++;
+      nextBtn.style.display = 'inline-block';
+    }
+
+    function updateProgress(){
+      const pct = Math.round((currentIndex/QUESTIONS.length)*100);
+      progressBar.style.width = pct + '%';
+    }
+
+    nextBtn.addEventListener('click', ()=>{
+      answered = false;
+      currentIndex++;
+      if(currentIndex < QUESTIONS.length){
+        loadQuestion();
+      } else {
+        finishQuiz();
+      }
+    });
+
+    revealBtn.addEventListener('click', ()=>{
+      // show correct answer (simulate click on correct)
+      const q = QUESTIONS[currentIndex];
+      const btns = optionsEl.querySelectorAll('.opt-btn');
+      btns.forEach((b, i) => {
+        if(i === q.a) b.classList.add('correct');
+        b.disabled = true;
+      });
+      answered = true;
+      nextBtn.style.display = 'inline-block';
+      revealBtn.style.display = 'none';
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      currentIndex = 0; score = 0; answered = false;
+      quizBox.style.display = 'block';
+      finalArea.style.display = 'none';
+      loadQuestion();
+    });
+
+    shareBtn.addEventListener('click', ()=>{
+      const url = location.href;
+      navigator.clipboard?.writeText(url).then(()=> alert('Link copied — share it on X and tag @RialoHQ!'));
+    });
+
+    function finishQuiz(){
+      quizBox.style.display = 'none';
+      finalArea.style.display = 'block';
+      scoreVal.textContent = score;
+      // special message
+      if(score === QUESTIONS.length){
+        specialMsg.style.display = 'block';
+      } else {
+        specialMsg.style.display = 'none';
+      }
+      // prepare tweet content
+    }
+
+    // Leaderboard localStorage (simple)
+    const LB_KEY = 'rialo_quiz_leaderboard_v1';
+    function getLeaderboard(){
+      try{
+        const raw = localStorage.getItem(LB_KEY);
+        return raw ? JSON.parse(raw) : [];
+      }catch(e){ return [];}
+    }
+    function saveLeaderboard(arr){
+      localStorage.setItem(LB_KEY, JSON.stringify(arr));
+    }
+    function renderLeaderboard(){
+      const lb = getLeaderboard().sort((a,b)=>b.score-a.score).slice(0,10);
+      leaderboardList.innerHTML = '';
+      if(lb.length === 0){ leaderboardList.innerHTML = '<li class="small">No scores yet — be the first!</li>'; return; }
+      lb.forEach(entry=>{
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${escapeHtml(entry.name||'Anon')}</strong> — ${entry.score}/${QUESTIONS.length} <div class="small">${new Date(entry.time).toLocaleString()}</div>`;
+        leaderboardList.appendChild(li);
+      });
+    }
+
+    saveScoreBtn.addEventListener('click', ()=>{
+      const name = (playerNameInput.value || '').trim() || 'Anon';
+      const lb = getLeaderboard();
+      lb.push({name,score,time:Date.now()});
+      saveLeaderboard(lb);
+      renderLeaderboard();
+      alert('Saved to leaderboard locally. Share your score on X to get noticed.');
+    });
+
+    // Tweet score
+    function tweetTextFor(score, name='') {
+      const text = `I scored ${score}/${QUESTIONS.length} on the Rialo community quiz! 🔥 Test your Rialo knowledge and join the community: ${location.href} @RialoHQ @itachee_x`;
+      return encodeURIComponent(text);
+    }
+    tweetScoreBtn.addEventListener('click', ()=>{
+      const name = playerNameInput.value || 'Anon';
+      const url = `https://x.com/intent/tweet?text=${tweetTextFor(score,name)}`;
+      window.open(url,'_blank');
+    });
+
+    tweetCTA.addEventListener('click', ()=>{
+      const url = `https://x.com/intent/tweet?text=${encodeURIComponent('I tried the Rialo quiz — test your knowledge and tag @RialoHQ @itachee_x! ' + location.href)}`;
+      window.open(url,'_blank');
+    });
+    openSiteBtn.addEventListener('click', ()=> window.open('https://rialo.io','_blank'));
+
+    // DAILY QUESTION rotation logic
+    function dailyIndex(){
+      const d = new Date();
+      // day of year mod dailyPool length
+      const start = new Date(d.getFullYear(),0,0);
+      const diff = d - start + ((start.getTimezoneOffset()-d.getTimezoneOffset())*60*1000);
+      const day = Math.floor(diff / (1000*60*60*24));
+      return day % dailyPool.length;
+    }
+    function showDaily(){
+      const idx = dailyIndex();
+      const entry = dailyPool[idx];
+      dailyQuestionDiv.textContent = entry.q;
+      todayDate.textContent = (new Date()).toLocaleDateString();
+      dailyReveal.onclick = ()=> {
+        alert('Answer: ' + entry.a);
+      };
+    }
+
+    // helper
+    function escapeHtml(txt){ return String(txt).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+
+    // init
+    loadQuestion();
+    renderLeaderboard();
+    showDaily();
+
+    // Small: show a tiny onboarding hint if first visit
+    if(!localStorage.getItem('rialo_quiz_seen_v1')){
+      setTimeout(()=> alert("Welcome! Take the quick Rialo quiz, save your score locally, and tweet your result tagging @RialoHQ and @itachee_x to get noticed."), 600);
+      localStorage.setItem('rialo_quiz_seen_v1','1');
+    }
+  </script>
+</body>
+</html>
